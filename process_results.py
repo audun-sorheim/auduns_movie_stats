@@ -94,6 +94,36 @@ def get_person_counts(peoples):
 
     return person_counts
 
+def actors_films(actor, df):
+
+    films = []
+
+    for _, row in df.iterrows():
+        if actor in row["Cast"]:
+            films.append(row["Title"])
+
+    return sorted(films)
+
+def directors_films(director, df):
+
+    films = []
+
+    for _, row in df.iterrows():
+        if director in row["Directors"]:
+            films.append(row["Title"])
+
+    return sorted(films)
+
+def composers_films(composer, df):
+
+    films = []
+
+    for _, row in df.iterrows():
+        if composer in str(row["Composers"]):
+            films.append(row["Title"])
+
+    return sorted(films)
+
 def main_rated():
     df_rated = load_rated_dataframe()
 
@@ -127,8 +157,26 @@ def main_all():
     print(f"The 20 actors I have seen the most movies with:\n{actor_counts.most_common()[:20]}")
     print(f"The 20 directors I have seen the most movies with:\n{director_counts.most_common()[:20]}")
     print(f"The 20 writers I have seen the most movies with:\n{writer_counts.most_common()[:20]}")
-    print(f"The 20 composers I have seen the most movies with:\n{composer_counts.most_common()[:20]}")
-    print(f"I have seen {actor_counts['Rachel McAdams']} Rachel McAdams films.")
+    print(f"The 20 composers I have seen the most movies with:\n{composer_counts.most_common()[:20]}\n")
+
+    print(f"I have seen {actor_counts['Rachel McAdams']} Rachel McAdams films:\n{actors_films('Rachel McAdams', df_all)}")
+    print(f"I have seen {actor_counts['Mark Ruffalo']} Mark Ruffalo films:\n{actors_films('Mark Ruffalo', df_all)}")
+    print(f"I have seen {actor_counts['Tom Cruise']} Tom Cruise films:\n{actors_films('Tom Cruise', df_all)}")
+    print(f"I have seen {actor_counts['Matt Damon']} Matt Damon films:\n{actors_films('Matt Damon', df_all)}")
+    print(f"I have seen {actor_counts['Vera Farmiga']} Vera Farmiga films:\n{actors_films('Vera Farmiga', df_all)}")
+    print(f"I have seen {actor_counts['Anne Hathaway']} Anne Hathaway films:\n{actors_films('Anne Hathaway', df_all)}\n")
+
+    print(f"I have seen {director_counts['Stanley Kubrick']} Stanley Kubrick films:\n{directors_films('Stanley Kubrick', df_all)}")
+    print(f"I have seen {director_counts['Christopher Nolan']} Christopher Nolan films:\n{directors_films('Christopher Nolan', df_all)}")
+    print(f"I have seen {director_counts['Steven Spielberg']} Steven Spielberg films:\n{directors_films('Steven Spielberg', df_all)}")
+    print(f"I have seen {director_counts['Greta Gerwig']} Greta Gerwig films:\n{directors_films('Greta Gerwig', df_all)}")
+    print(f"I have seen {director_counts['Sofia Coppola']} Sofia Coppola films:\n{directors_films('Sofia Coppola', df_all)}")
+    print(f"I have seen {director_counts['David Fincher']} David Fincher films:\n{directors_films('David Fincher', df_all)}\n")
+
+    print(f"I have seen {composer_counts['John Williams']} John Williams films:\n{composers_films('John Williams', df_all)}")
+    print(f"I have seen {composer_counts['Howard Shore']} Howard Shore films:\n{composers_films('Howard Shore', df_all)}")
+    print(f"I have seen {composer_counts['Hans Zimmer']} Hans Zimmer films:\n{composers_films('Hans Zimmer', df_all)}")
+
     return None
 
 if __name__=='__main__':
