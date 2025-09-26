@@ -18,16 +18,23 @@ def fetch_tmdb_data(imdb_id):
     url_credits = f"https://api.themoviedb.org/3/movie/{imdb_id_full}/credits"
     r = requests.get(url_credits, params={"api_key": TMDB_API_KEY}).json()
 
+    url_full = f"https://api.themoviedb.org/3/movie/{imdb_id_full}/credits"
+    r_full = requests.get(url_full, params={"api_key": TMDB_API_KEY}).json()
+
     directors = [d["name"] for d in r["crew"] if d["job"]=="Director"]
     writers = [w["name"] for w in r["crew"] if w["job"] in ("Writer","Screenplay")]
     composer = [c["name"] for c in r["crew"] if c["job"]=="Original Music Composer"]
     cast = [a["name"] for a in r["cast"][:100]] # Limit to 100 top billed cast
+    origin_country = r_full["origin_country"]
+    orig_language = r_full["original_language"]
 
     return {
             "Directors": ", ".join(directors),
             "Writers": ", ".join(writers),
             "Composers": ", ".join(composer),
-            "Cast": ", ".join(cast)
+            "Cast": ", ".join(cast),
+            "Origin_country": ", ".join(origin_country),
+            "Original_language": ", ".join(orig_language)
             }
 
 def fetch_omdb_data(imdb_id):
