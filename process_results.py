@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import collections
+import geopandas as gpd
 
 def load_rated_dataframe():
     return pd.read_csv("ltrbxd_rated_films_with_metadata.csv")
@@ -70,6 +71,36 @@ def plot_all_ratings(imdb_ratings, metascore):
     plt.legend()
     plt.savefig("plots/IMDb_vs_metascore_hist.png")
     plt.close()
+
+def plot_world_map(df):
+    df_countries = (
+    df["OriginCountry"]
+    .str.split(", ")
+    .explode()
+    .value_counts()
+    .reset_index()
+    )
+    df_countries.columns = ["country", "count"]
+    world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
+    world = world.merge(df_countries, how="left", left_on="name", right_on="country")
+
+    fig, ax = plt.subplots(figsize=(15, 8))
+
+    world.plot(
+        column="count",
+        cmap="OrRd",  # red gradient
+        linewidth=0.8,
+        ax=ax,
+        edgecolor="0.8",
+        legend=True,
+        missing_kwds={"color": "lightgrey", "label": "No data"}
+    )
+
+    ax.set_title("Movies by Country (from TMDb origin_country)", fontsize=16)
+    ax.axis("off")
+    plt.savefig("plots/world_plot.png")
+
+    return None 
 
 def process_people(peoples):
 
@@ -149,6 +180,8 @@ def main_all():
     # imdb_ratings = df_all["IMDbRating"]
     # metascore = df_all["Metascore"]
     # plot_all_ratings(imdb_ratings, metascore)
+
+    plot_world_map(df_all)
 
     actor_counts = get_person_counts(df_all["Cast"].copy())
     director_counts = get_person_counts(df_all["Directors"].copy())
