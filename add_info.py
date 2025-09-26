@@ -16,7 +16,7 @@ def fetch_new_data(imdb_id):
 
     if not r.get("movie_results"):
         print("TMDb: Movie not found")
-        return {}
+        return [], []
 
     url_credits = f"https://api.themoviedb.org/3/movie/{imdb_id_full}"
     r = requests.get(url_credits, params={"api_key": TMDB_API_KEY}).json()
