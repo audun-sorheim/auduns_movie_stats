@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import collections
 import geopandas as gpd
+import country_converter as coco
 
 def load_rated_dataframe():
     return pd.read_csv("ltrbxd_rated_films_with_metadata.csv")
@@ -81,8 +82,10 @@ def plot_world_map(df):
     .reset_index()
     )
     df_countries.columns = ["country", "count"]
-    world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
-    world = world.merge(df_countries, how="left", left_on="name", right_on="country")
+    url = "https://naturalearth.s3.amazonaws.com/110m_cultural/ne_110m_admin_0_countries.zip"
+    world = gpd.read_file(url)
+    world["country_std"] = coco.convert(names=world["ADMIN"], to="name_short")
+    world = world.merge(df_countries, how="left", left_on="country_std", right_on="country")
 
     fig, ax = plt.subplots(figsize=(15, 8))
 
