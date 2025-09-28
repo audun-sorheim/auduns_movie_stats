@@ -25,16 +25,16 @@ def fetch_tmdb_data(imdb_id):
     writers = [w["name"] for w in r["crew"] if w["job"] in ("Writer","Screenplay")]
     composer = [c["name"] for c in r["crew"] if c["job"]=="Original Music Composer"]
     cast = [a["name"] for a in r["cast"][:100]] # Limit to 100 top billed cast
-    origin_country = r_full["origin_country"]
-    orig_language = r_full["original_language"]
+    origin_country = ", ".join(r_full.get("origin_country", [])) 
+    orig_language = r_full.get("original_language")
 
     return {
             "Directors": ", ".join(directors),
             "Writers": ", ".join(writers),
             "Composers": ", ".join(composer),
             "Cast": ", ".join(cast),
-            "Origin_country": ", ".join(origin_country),
-            "Original_language": ", ".join(orig_language)
+            "Origin_country": origin_country, 
+            "Original_language": orig_language
             }
 
 def fetch_omdb_data(imdb_id):
