@@ -73,6 +73,27 @@ def plot_all_ratings(imdb_ratings, metascore):
     plt.savefig("plots/IMDb_vs_metascore_hist.png")
     plt.close()
 
+def plot_people_bar_graph(people_counts, people_type):
+    people = [el[0] for el in people_counts]
+    counts = [el[1] for el in people_counts]
+    os.makedirs("plots", exist_ok=True)
+
+    plt.figure(figsize=(12,6))
+    bars = plt.bar(people, counts, width=0.7, color="steelblue", edgecolor="black")
+    plt.title(f"{people_type} Frequency", fontsize=16, weight="bold")
+    plt.xlabel(people_type, fontsize=14)
+    plt.ylabel("Count", fontsize=14)
+    plt.xticks(rotation=45, ha="right", fontsize=10)
+    plt.yticks(fontsize=10)
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    # for bar in bars:
+    #     height = bar.get_height()
+    #     plt.text(bar.get_x() + bar.get_width()/2, height + 0.5, str(height),
+    #              ha="center", va="bottom", fontsize=9)
+    plt.tight_layout()
+    plt.savefig(f"plots/{people_type}_frequency.png", dpi=300)
+    plt.close()
+
 def plot_world_map(df):
     df_countries = (
     df["OriginCountry"]
@@ -192,6 +213,10 @@ def main_all():
     composer_counts = get_person_counts(df_all["Composers"].copy())
     lang_counts = get_person_counts(df_all["OriginalLanguage"].copy())
     coun_counts = get_person_counts(df_all["OriginCountry"].copy())
+    plot_people_bar_graph(actor_counts.most_common()[:50], "actor")
+    plot_people_bar_graph(director_counts.most_common()[:50], "director")
+    plot_people_bar_graph(writer_counts.most_common()[:50], "writer")
+    plot_people_bar_graph(composer_counts.most_common()[:50], "composer")
     print(f"The 20 actors I have seen the most movies with:\n{actor_counts.most_common()[:20]}")
     print(f"The 20 directors I have seen the most movies with:\n{director_counts.most_common()[:20]}")
     print(f"The 20 writers I have seen the most movies with:\n{writer_counts.most_common()[:20]}")
