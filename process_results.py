@@ -86,10 +86,6 @@ def plot_people_bar_graph(people_counts, people_type):
     plt.xticks(rotation=45, ha="right", fontsize=10)
     plt.yticks(fontsize=10)
     plt.grid(axis="y", linestyle="--", alpha=0.7)
-    # for bar in bars:
-    #     height = bar.get_height()
-    #     plt.text(bar.get_x() + bar.get_width()/2, height + 0.5, str(height),
-    #              ha="center", va="bottom", fontsize=9)
     plt.tight_layout()
     plt.savefig(f"plots/{people_type}_frequency.png", dpi=300)
     plt.close()
@@ -191,19 +187,19 @@ def main_rated():
     director_counts = get_person_counts(df_rated["Directors"].copy())
     writer_counts = get_person_counts(df_rated["Writers"].copy())
     composer_counts = get_person_counts(df_rated["Composers"].copy())
-    print(f"The 20 actors I have seen the most movies with:\n{actor_counts.most_common()[:20]}")
-    print(f"The 20 directors I have seen the most movies with:\n{director_counts.most_common()[:20]}")
-    print(f"The 20 writers I have seen the most movies with:\n{writer_counts.most_common()[:20]}")
-    print(f"The 20 composers I have seen the most movies with:\n{composer_counts.most_common()[:20]}")
+    print(f"The 20 actors I have seen the most movies with:\n{actor_counts.most_common(20)}")
+    print(f"The 20 directors I have seen the most movies with:\n{director_counts.most_common(20)}")
+    print(f"The 20 writers I have seen the most movies with:\n{writer_counts.most_common(20)}")
+    print(f"The 20 composers I have seen the most movies with:\n{composer_counts.most_common(20)}")
 
     return None
 
 def main_all():
     df_all = load_all_dataframe()
 
-    # imdb_ratings = df_all["IMDbRating"]
-    # metascore = df_all["Metascore"]
-    # plot_all_ratings(imdb_ratings, metascore)
+    imdb_ratings = df_all["IMDbRating"]
+    metascore = df_all["Metascore"]
+    plot_all_ratings(imdb_ratings, metascore)
 
     plot_world_map(df_all)
 
@@ -213,14 +209,21 @@ def main_all():
     composer_counts = get_person_counts(df_all["Composers"].copy())
     lang_counts = get_person_counts(df_all["OriginalLanguage"].copy())
     coun_counts = get_person_counts(df_all["OriginCountry"].copy())
-    plot_people_bar_graph(actor_counts.most_common()[:50], "actor")
-    plot_people_bar_graph(director_counts.most_common()[:50], "director")
-    plot_people_bar_graph(writer_counts.most_common()[:50], "writer")
-    plot_people_bar_graph(composer_counts.most_common()[:50], "composer")
-    print(f"The 20 actors I have seen the most movies with:\n{actor_counts.most_common()[:20]}")
-    print(f"The 20 directors I have seen the most movies with:\n{director_counts.most_common()[:20]}")
-    print(f"The 20 writers I have seen the most movies with:\n{writer_counts.most_common()[:20]}")
-    print(f"The 20 composers I have seen the most movies with:\n{composer_counts.most_common()[:20]}\n")
+
+    filtered_actor_counts = [(actor, count) for actor, count in actor_counts.most_common() if count >= 10]
+    filtered_director_counts = [(director, count) for director, count in director_counts.most_common() if count >= 3]
+    filtered_writer_counts = [(writer, count) for writer, count in writer_counts.most_common() if count >= 4]
+    filtered_composer_counts = [(composer, count) for composer, count in composer_counts.most_common() if count >= 4]
+
+    plot_people_bar_graph(filtered_actor_counts, "actor")
+    plot_people_bar_graph(filtered_director_counts, "director")
+    plot_people_bar_graph(filtered_writer_counts, "writer")
+    plot_people_bar_graph(filtered_composer_counts, "composer")
+
+    print(f"The 20 actors I have seen the most movies with:\n{filtered_actor_counts}")
+    print(f"The 20 directors I have seen the most movies with:\n{filtered_director_counts}")
+    print(f"The 20 writers I have seen the most movies with:\n{filtered_writer_counts}")
+    print(f"The 20 composers I have seen the most movies with:\n{filtered_composer_counts}\n")
     print(f"The languages I have seen the most movies with:\n{lang_counts.most_common()}")
     print(f"The countries I have seen the most movies from:\n{coun_counts.most_common()}\n")
 
