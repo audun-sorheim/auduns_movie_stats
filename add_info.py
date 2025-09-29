@@ -2,8 +2,7 @@ import requests
 import tqdm
 import pandas as pd
 from process_results import load_all_dataframe, load_rated_dataframe
-import langcodes
-import country_converter as coco
+from get_metadata import process_data
 
 TMDB_API_KEY = "c4e8c4ca2a6f4c6411dc47aca067218f"
 OMDB_API_KEY = "7a043e00"
@@ -24,30 +23,9 @@ def fetch_new_data(imdb_id):
     countries = ", ".join(r.get("origin_country", [])) 
     language = r.get("original_language")
 
+    countries, language = process_data(countries, language)
+
     return countries, language
-
-def process_data(id):
-    orig_country, orig_language = fetch_new_data(id)
-
-    if orig_country is None:
-        print(f"Country could not be found for IMDbID: {id}")
-        coun = None
-    else:
-        if isinstance(orig_country, list):
-            coun = [coco.convert(names=c, to="name_short") for c in orig_country]
-        else:
-            coun = coco.convert(names=orig_country, to="name_short")
-
-    if orig_language is None:
-        print(f"Language could not be found for IMDbID: {id}")
-        lang = None
-    else:
-        if isinstance(orig_language, list):
-            lang = [langcodes.Language.get(l).display_name() for l in orig_language]
-        else:
-            lang = langcodes.Language.get(orig_language).display_name()
-
-    return coun, lang
 
 def get_info(df):
 
@@ -55,7 +33,7 @@ def get_info(df):
     languages = []
 
     for id in tqdm.tqdm(df["imdbID"]):
-        orig_country, orig_language = process_data(id)
+        orig_country, orig_language = fetch_new_data(id)
         countries.append(orig_country)
         languages.append(orig_language)
 

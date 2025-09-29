@@ -1,9 +1,33 @@
 import requests
 import pandas as pd
 import tqdm
+import langcodes
+import country_converter as coco
 
 TMDB_API_KEY = "c4e8c4ca2a6f4c6411dc47aca067218f"
 OMDB_API_KEY = "7a043e00"
+
+def process_data(orig_country, orig_language):
+
+    if orig_country is None:
+        print(f"Country could not be found for IMDbID: {id}")
+        coun = None
+    else:
+        if isinstance(orig_country, list):
+            coun = [coco.convert(names=c, to="name_short") for c in orig_country]
+        else:
+            coun = coco.convert(names=orig_country, to="name_short")
+
+    if orig_language is None:
+        print(f"Language could not be found for IMDbID: {id}")
+        lang = None
+    else:
+        if isinstance(orig_language, list):
+            lang = [langcodes.Language.get(l).display_name() for l in orig_language]
+        else:
+            lang = langcodes.Language.get(orig_language).display_name()
+
+    return coun, lang
 
 def fetch_tmdb_data(imdb_id):
     imdb_id_full = f"tt{str(imdb_id).zfill(7)}"
@@ -18,21 +42,24 @@ def fetch_tmdb_data(imdb_id):
     url_credits = f"https://api.themoviedb.org/3/movie/{imdb_id_full}/credits"
     r = requests.get(url_credits, params={"api_key": TMDB_API_KEY}).json()
 
-    url_full = f"https://api.themoviedb.org/3/movie/{imdb_id_full}/credits"
+    url_full = f"https://api.themoviedb.org/3/movie/{imdb_id_full}"
     r_full = requests.get(url_full, params={"api_key": TMDB_API_KEY}).json()
 
     directors = [d["name"] for d in r["crew"] if d["job"]=="Director"]
     writers = [w["name"] for w in r["crew"] if w["job"] in ("Writer","Screenplay")]
     composer = [c["name"] for c in r["crew"] if c["job"]=="Original Music Composer"]
     cast = [a["name"] for a in r["cast"][:100]] # Limit to 100 top billed cast
-    origin_country = ", ".join(r_full.get("origin_country", [])) 
-    orig_language = r_full.get("original_language")
+    countries = ", ".join(r_full.get("origin_country", [])) 
+    language = r_full.get("original_language")
+
+    origin_country, orig_language = process_data(countries, language)
 
     return {
             "Directors": ", ".join(directors),
             "Writers": ", ".join(writers),
             "Composers": ", ".join(composer),
-            "Cast": ", ".join(cast),
+            "Cast": ", ".join(cast)
+            }, {
             "Origin_country": origin_country, 
             "Original_language": orig_language
             }
@@ -54,10 +81,10 @@ def fetch_omdb_data(imdb_id):
     }
 
 def fetch_metadata(imdb_id):
-    tmdb_data = fetch_tmdb_data(imdb_id)
+    tmdb_data, extra_data = fetch_tmdb_data(imdb_id)
     omdb_data = fetch_omdb_data(imdb_id)
 
-    metadata = {**tmdb_data, **omdb_data}
+    metadata = {**tmdb_data, **omdb_data, **extra_data}
     return metadata
 
 def load_all_data():
