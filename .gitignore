@@ -1,4 +1,3 @@
 __pycache__/
 unused/
-ltrbxd_all_films_with_metadata copy.csv
-ltrbxd_rated_films_with_metadata copy.csv
+*.csv
