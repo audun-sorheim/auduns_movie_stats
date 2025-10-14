@@ -145,107 +145,40 @@ def get_person_counts(peoples):
 
     return person_counts
 
-def actors_films(actor, df):
+def person_films(df, person, role):
+
+    if role not in df.columns:
+        raise ValueError(f"Role '{role}' not found in DataFrame columns. Role must be one of {df.columns.tolist()}")
 
     films = []
 
     for _, row in df.iterrows():
-        if actor in row["Cast"]:
+        if person in str(row[role]):
             films.append(row["Title"])
 
     return sorted(films)
 
-def directors_films(director, df):
+def get_ratings_averages(people_ratings_dict):
+    people_avg_ratings = {person: np.round(np.mean(ratings), 3) for person, ratings in people_ratings_dict.items()}
+    return {k: v for k, v in sorted(people_avg_ratings.items(), key=lambda item: item[1], reverse=True)}
 
-    films = []
+def get_people_ratings(df, role):
+
+    if role not in df.columns:
+        raise ValueError(f"Role '{role}' not found in DataFrame columns. Role must be one of {df.columns.tolist()}")
+    
+    people_ratings_dict = {}
 
     for _, row in df.iterrows():
-        if director in row["Directors"]:
-            films.append(row["Title"])
+        for person in str(row[role]).split(", "):
+            if person == 'nan':
+                continue
+            if person not in people_ratings_dict:
+                people_ratings_dict[person] = []
+            people_ratings_dict[person].append(row["Rating"])
 
-    return sorted(films)
+    people_ratings_dict = {person: ratings for person, ratings in people_ratings_dict.items() if len(ratings) >= 3}
 
-def composers_films(composer, df):
+    people_avg_ratings = get_ratings_averages(people_ratings_dict)
 
-    films = []
-
-    for _, row in df.iterrows():
-        if composer in str(row["Composers"]):
-            films.append(row["Title"])
-
-    return sorted(films)
-
-def main_rated():
-    df_rated = load_rated_dataframe()
-
-    # ratings = df_rated["Rating"]
-    # imdb_ratings = df_rated["IMDbRating"]
-    # metascore = df_rated["Metascore"]
-    # plot_rated_ratings(ratings, imdb_ratings, metascore)
-
-    actor_counts = get_person_counts(df_rated["Cast"].copy())
-    director_counts = get_person_counts(df_rated["Directors"].copy())
-    writer_counts = get_person_counts(df_rated["Writers"].copy())
-    composer_counts = get_person_counts(df_rated["Composers"].copy())
-    print(f"The 20 actors I have seen the most movies with:\n{actor_counts.most_common(20)}")
-    print(f"The 20 directors I have seen the most movies with:\n{director_counts.most_common(20)}")
-    print(f"The 20 writers I have seen the most movies with:\n{writer_counts.most_common(20)}")
-    print(f"The 20 composers I have seen the most movies with:\n{composer_counts.most_common(20)}")
-
-    return None
-
-def main_all():
-    df_all = load_all_dataframe()
-
-    imdb_ratings = df_all["IMDbRating"]
-    metascore = df_all["Metascore"]
-    plot_all_ratings(imdb_ratings, metascore)
-
-    plot_world_map(df_all)
-
-    actor_counts = get_person_counts(df_all["Cast"].copy())
-    director_counts = get_person_counts(df_all["Directors"].copy())
-    writer_counts = get_person_counts(df_all["Writers"].copy())
-    composer_counts = get_person_counts(df_all["Composers"].copy())
-    lang_counts = get_person_counts(df_all["OriginalLanguage"].copy())
-    coun_counts = get_person_counts(df_all["OriginCountry"].copy())
-
-    filtered_actor_counts = [(actor, count) for actor, count in actor_counts.most_common() if count >= 10]
-    filtered_director_counts = [(director, count) for director, count in director_counts.most_common() if count >= 3]
-    filtered_writer_counts = [(writer, count) for writer, count in writer_counts.most_common() if count >= 4]
-    filtered_composer_counts = [(composer, count) for composer, count in composer_counts.most_common() if count >= 4]
-
-    plot_people_bar_graph(filtered_actor_counts, "actor")
-    plot_people_bar_graph(filtered_director_counts, "director")
-    plot_people_bar_graph(filtered_writer_counts, "writer")
-    plot_people_bar_graph(filtered_composer_counts, "composer")
-
-    print(f"The 20 actors I have seen the most movies with:\n{filtered_actor_counts}")
-    print(f"The 20 directors I have seen the most movies with:\n{filtered_director_counts}")
-    print(f"The 20 writers I have seen the most movies with:\n{filtered_writer_counts}")
-    print(f"The 20 composers I have seen the most movies with:\n{filtered_composer_counts}\n")
-    print(f"The languages I have seen the most movies with:\n{lang_counts.most_common()}")
-    print(f"The countries I have seen the most movies from:\n{coun_counts.most_common()}\n")
-
-    print(f"I have seen {actor_counts['Rachel McAdams']} Rachel McAdams films:\n{actors_films('Rachel McAdams', df_all)}")
-    print(f"I have seen {actor_counts['Mark Ruffalo']} Mark Ruffalo films:\n{actors_films('Mark Ruffalo', df_all)}")
-    print(f"I have seen {actor_counts['Tom Cruise']} Tom Cruise films:\n{actors_films('Tom Cruise', df_all)}")
-    print(f"I have seen {actor_counts['Matt Damon']} Matt Damon films:\n{actors_films('Matt Damon', df_all)}")
-    print(f"I have seen {actor_counts['Vera Farmiga']} Vera Farmiga films:\n{actors_films('Vera Farmiga', df_all)}")
-    print(f"I have seen {actor_counts['Anne Hathaway']} Anne Hathaway films:\n{actors_films('Anne Hathaway', df_all)}\n")
-
-    print(f"I have seen {director_counts['Stanley Kubrick']} Stanley Kubrick films:\n{directors_films('Stanley Kubrick', df_all)}")
-    print(f"I have seen {director_counts['Christopher Nolan']} Christopher Nolan films:\n{directors_films('Christopher Nolan', df_all)}")
-    print(f"I have seen {director_counts['Steven Spielberg']} Steven Spielberg films:\n{directors_films('Steven Spielberg', df_all)}")
-    print(f"I have seen {director_counts['Greta Gerwig']} Greta Gerwig films:\n{directors_films('Greta Gerwig', df_all)}")
-    print(f"I have seen {director_counts['Sofia Coppola']} Sofia Coppola films:\n{directors_films('Sofia Coppola', df_all)}")
-    print(f"I have seen {director_counts['David Fincher']} David Fincher films:\n{directors_films('David Fincher', df_all)}\n")
-
-    print(f"I have seen {composer_counts['John Williams']} John Williams films:\n{composers_films('John Williams', df_all)}")
-    print(f"I have seen {composer_counts['Howard Shore']} Howard Shore films:\n{composers_films('Howard Shore', df_all)}")
-    print(f"I have seen {composer_counts['Hans Zimmer']} Hans Zimmer films:\n{composers_films('Hans Zimmer', df_all)}")
-
-    return None
-
-if __name__=='__main__':
-    main_all()
+    return people_ratings_dict, people_avg_ratings
