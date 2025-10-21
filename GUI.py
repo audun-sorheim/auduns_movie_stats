@@ -12,15 +12,18 @@ def index():
         film_year = request.form["film_year"]
         rating = request.form["rating"]
         imdb_id = request.form["imdb_id"]
-        confirm = request.form.get("confirm")
+        confirm_all = request.form.get("confirm_all")
+        confirm_rated = request.form.get("confirm_rated")
+        metadata = fetch_metadata(imdb_id)
 
-        if confirm == "yes":
-            write_rated_row(film_name, film_year, rating, imdb_id)
+        if confirm_all == "yes":
             write_all_row(film_name, film_year, imdb_id)
-            metadata = fetch_metadata(imdb_id)
-            write_rated_metadata_row(film_name, film_year, rating, imdb_id, metadata)
             write_all_metadata_row(film_name, film_year, imdb_id, metadata)
-            flash(f"{film_name} written to CSVs ✅")
+            flash(f"{film_name} written to all CSVs ✅")
+        if confirm_rated == "yes":
+            write_rated_row(film_name, film_year, rating, imdb_id)
+            write_rated_metadata_row(film_name, film_year, rating, imdb_id, metadata)
+            flash(f"{film_name} written to rated CSVs ✅")
         else:
             flash(f"You decided not to write {film_name}.")
 
