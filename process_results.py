@@ -120,7 +120,38 @@ def plot_world_map(df):
     ax.axis("off")
     plt.savefig("plots/world_plot.png")
 
-    return None 
+    return None
+
+def plot_contrarian_bars(rating_diffs, title, filename):
+    os.makedirs("plots", exist_ok=True)
+
+    people = list(rating_diffs.keys())[:10]
+    diffs = list(rating_diffs.values())[:10]
+
+    plt.figure(figsize=(12,6))
+    bars = plt.bar(people, diffs, width=0.7, color="salmon", edgecolor="black")
+    plt.title(title, fontsize=16, weight="bold")
+    plt.xlabel("Person", fontsize=14)
+    plt.ylabel("Average Rating Difference", fontsize=14)
+    plt.xticks(rotation=45, ha="right", fontsize=10)
+    plt.yticks(fontsize=10)
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.tight_layout()
+    plt.savefig(f"plots/{filename}.png", dpi=300)
+    plt.close()
+
+def plot_year_histogram(years):
+    bins = np.arange(1940, 2026, 5)
+    print(bins)
+
+    os.makedirs("plots", exist_ok=True)
+
+    plt.figure()
+    plt.hist(years, bins=bins, label="years", alpha=1)
+    plt.xlim((np.min(years)-1, np.max(years)+1))
+    plt.xticks(bins[:-1], labels=bins[:-1], rotation=45)
+    plt.savefig("plots/films_years_hist.png")
+    plt.close()
 
 def process_people(peoples):
 

@@ -8,7 +8,9 @@ from process_results import (
     get_person_counts,
     get_people_ratings,
     plot_people_bar_graph,
-    person_films
+    person_films,
+    plot_contrarian_bars,
+    plot_year_histogram
 )
 
 def main_rated():
@@ -31,6 +33,13 @@ def main_rated():
 
     rating_diff_public = np.float64(df_rated["Rating"] - df_rated["IMDbRating"])
     rating_diff_critics = np.float64(df_rated["Rating"] - df_rated["Metascore"])
+    rating_diff_public_dict = dict(key for key in zip(df_rated["Title"], rating_diff_public))
+    rating_diff_critics_dict = dict(key for key in zip(df_rated["Title"], rating_diff_critics))
+    positive_rating_diff_public_sorted = dict(sorted(rating_diff_public_dict.items(), key=lambda item: item[1], reverse=True))
+    negative_rating_diff_public_sorted = dict(sorted(rating_diff_public_dict.items(), key=lambda item: item[1]))
+    positive_rating_diff_critics_sorted = dict(sorted(rating_diff_critics_dict.items(), key=lambda item: item[1], reverse=True))
+    negative_rating_diff_critics_sorted = dict(sorted(rating_diff_critics_dict.items(), key=lambda item: item[1]))
+    print(positive_rating_diff_public_sorted)
     print(df_rated["Title"][np.nanargmax(rating_diff_public)], np.round(rating_diff_public[np.nanargmax(rating_diff_public)], 2))
     print(df_rated["Title"][np.nanargmin(rating_diff_public)], rating_diff_public[np.nanargmin(rating_diff_public)])
     print(df_rated["Title"][np.nanargmax(rating_diff_critics)], rating_diff_critics[np.nanargmax(rating_diff_critics)])
@@ -45,6 +54,11 @@ def main_rated():
     median_rating_diff_critics = np.round(np.median(rating_diff_critics),2)
     print(avg_rating_diff_critics, avg_rating_diff_public, median_rating_diff_critics, median_rating_diff_public)
     print(np.sum(rating_diff_public), np.sum(rating_diff_critics))
+
+    plot_contrarian_bars(positive_rating_diff_public_sorted, "Positive rating difference vs IMDb", "pos_rating_diff_public")
+    plot_contrarian_bars(negative_rating_diff_public_sorted, "Negative rating difference vs IMDb", "neg_rating_diff_public")
+    plot_contrarian_bars(positive_rating_diff_critics_sorted, "Positive rating difference vs Metascore", "pos_rating_diff_critics")
+    plot_contrarian_bars(negative_rating_diff_critics_sorted, "Negative rating difference vs Metascore", "neg_rating_diff_critics")
 
     composer_ratings, composer_avg_ratings = get_people_ratings(df_rated, "Composers")
     actor_ratings, actor_avg_ratings = get_people_ratings(df_rated, "Cast")
@@ -65,6 +79,11 @@ def main_all():
     plot_all_ratings(imdb_ratings, metascore)
 
     plot_world_map(df_all)
+
+    year_counts = df_all["Year"].value_counts().sort_index()
+    print(df_all["Year"].values)
+    plot_year_histogram(df_all["Year"].values)
+    # print(f"Number of films seen per year:\n{plotyear_counts}\n")
 
     actor_counts = get_person_counts(df_all["Cast"].copy())
     director_counts = get_person_counts(df_all["Directors"].copy())
