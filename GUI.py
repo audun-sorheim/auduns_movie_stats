@@ -8,6 +8,7 @@ app.secret_key = "secret123"  # needed for flash messages
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
+        dir = request.form["user_dir"]
         film_name = request.form["film_name"]
         film_year = request.form["film_year"]
         rating = request.form["rating"]
@@ -17,13 +18,13 @@ def index():
         metadata = fetch_metadata(imdb_id)
 
         if confirm_all == "yes":
-            write_all_row(film_name, film_year, imdb_id)
-            write_all_metadata_row(film_name, film_year, imdb_id, metadata)
-            flash(f"{film_name} written to all CSVs ✅")
+            write_all_row(film_name, film_year, imdb_id, dir)
+            write_all_metadata_row(film_name, film_year, imdb_id, metadata, dir)
+            flash(f"{film_name} written to all CSVs for {dir} ✅")
         if confirm_rated == "yes":
-            write_rated_row(film_name, film_year, rating, imdb_id)
-            write_rated_metadata_row(film_name, film_year, rating, imdb_id, metadata)
-            flash(f"{film_name} written to rated CSVs ✅")
+            write_rated_row(film_name, film_year, rating, imdb_id, dir)
+            write_rated_metadata_row(film_name, film_year, rating, imdb_id, metadata, dir)
+            flash(f"{film_name} written to rated CSVs for {dir} ✅")
         else:
             flash(f"You decided not to write {film_name}.")
 

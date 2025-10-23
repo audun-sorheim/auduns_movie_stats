@@ -39,10 +39,17 @@ def get_info(df):
 
     return countries, languages
 
-def main():
+def main(audun_bool=True, mali_bool=False):
 
-    df_all = load_all_dataframe()
-    df_rated = load_rated_dataframe()
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+
+    df_all = load_all_dataframe(audun_bool=audun_bool, mali_bool=mali_bool)
+    df_rated = load_rated_dataframe(audun_bool=audun_bool, mali_bool=mali_bool)
 
     all_countries, all_languages = get_info(df_all)
     rated_countries, rated_languages = get_info(df_rated)
@@ -52,10 +59,12 @@ def main():
     df_rated["OriginCountry"] = rated_countries
     df_rated["OriginalLanguage"] = rated_languages
 
-    df_all.to_csv("ltrbxd_all_films_with_metadata.csv", index=False)
-    df_rated.to_csv("ltrbxd_rated_films_with_metadata.csv", index=False)
+    df_all.to_csv(f"{dir}/ltrbxd_all_films_with_metadata.csv", index=False)
+    df_rated.to_csv(f"{dir}/ltrbxd_rated_films_with_metadata.csv", index=False)
     print("✅ New appended and saved ")
     return None
 
 if __name__ == '__main__':
-    main()
+    audun_bool = input("Is this for Audun? (y/n): ").lower() == 'y'
+    mali_bool = input("Is this for Mali? (y/n): ").lower() == 'y'
+    main(audun_bool=audun_bool, mali_bool=mali_bool)

@@ -13,13 +13,13 @@ from process_results import (
     plot_year_histogram
 )
 
-def main_rated():
-    df_rated = load_rated_dataframe()
+def main_rated(audun_bool=True, mali_bool=False):
+    df_rated = load_rated_dataframe(audun_bool=audun_bool, mali_bool=mali_bool)
 
     ratings = df_rated["Rating"]
     imdb_ratings = df_rated["IMDbRating"]
     metascore = df_rated["Metascore"]
-    plot_rated_ratings(ratings, imdb_ratings, metascore)
+    plot_rated_ratings(ratings, imdb_ratings, metascore, audun_bool=audun_bool, mali_bool=mali_bool)
 
     actor_counts = get_person_counts(df_rated["Cast"].copy())
     director_counts = get_person_counts(df_rated["Directors"].copy())
@@ -55,10 +55,10 @@ def main_rated():
     print(avg_rating_diff_critics, avg_rating_diff_public, median_rating_diff_critics, median_rating_diff_public)
     print(np.sum(rating_diff_public), np.sum(rating_diff_critics))
 
-    plot_contrarian_bars(positive_rating_diff_public_sorted, "Positive rating difference vs IMDb", "pos_rating_diff_public")
-    plot_contrarian_bars(negative_rating_diff_public_sorted, "Negative rating difference vs IMDb", "neg_rating_diff_public")
-    plot_contrarian_bars(positive_rating_diff_critics_sorted, "Positive rating difference vs Metascore", "pos_rating_diff_critics")
-    plot_contrarian_bars(negative_rating_diff_critics_sorted, "Negative rating difference vs Metascore", "neg_rating_diff_critics")
+    plot_contrarian_bars(positive_rating_diff_public_sorted, "Positive rating difference vs IMDb", "pos_rating_diff_public", audun_bool=audun_bool, mali_bool=mali_bool)
+    plot_contrarian_bars(negative_rating_diff_public_sorted, "Negative rating difference vs IMDb", "neg_rating_diff_public", audun_bool=audun_bool, mali_bool=mali_bool)
+    plot_contrarian_bars(positive_rating_diff_critics_sorted, "Positive rating difference vs Metascore", "pos_rating_diff_critics", audun_bool=audun_bool, mali_bool=mali_bool)
+    plot_contrarian_bars(negative_rating_diff_critics_sorted, "Negative rating difference vs Metascore", "neg_rating_diff_critics", audun_bool=audun_bool, mali_bool=mali_bool)
 
     composer_ratings, composer_avg_ratings = get_people_ratings(df_rated, "Composers")
     actor_ratings, actor_avg_ratings = get_people_ratings(df_rated, "Cast")
@@ -71,18 +71,18 @@ def main_rated():
 
     return None
 
-def main_all():
-    df_all = load_all_dataframe()
+def main_all(audun_bool=True, mali_bool=False):
+    df_all = load_all_dataframe(audun_bool=audun_bool, mali_bool=mali_bool)
 
     imdb_ratings = df_all["IMDbRating"]
     metascore = df_all["Metascore"]
-    plot_all_ratings(imdb_ratings, metascore)
+    plot_all_ratings(imdb_ratings, metascore, audun_bool=audun_bool, mali_bool=mali_bool)
 
-    plot_world_map(df_all)
+    plot_world_map(df_all, audun_bool=audun_bool, mali_bool=mali_bool)
 
     year_counts = df_all["Year"].value_counts().sort_index()
     print(df_all["Year"].values)
-    plot_year_histogram(df_all["Year"].values)
+    plot_year_histogram(df_all["Year"].values, audun_bool=audun_bool, mali_bool=mali_bool)
     # print(f"Number of films seen per year:\n{plotyear_counts}\n")
 
     actor_counts = get_person_counts(df_all["Cast"].copy())
@@ -97,10 +97,10 @@ def main_all():
     filtered_writer_counts = [(writer, count) for writer, count in writer_counts.most_common() if count >= 4]
     filtered_composer_counts = [(composer, count) for composer, count in composer_counts.most_common() if count >= 4]
 
-    plot_people_bar_graph(filtered_actor_counts, "actor")
-    plot_people_bar_graph(filtered_director_counts, "director")
-    plot_people_bar_graph(filtered_writer_counts, "writer")
-    plot_people_bar_graph(filtered_composer_counts, "composer")
+    plot_people_bar_graph(filtered_actor_counts, "actor", audun_bool=audun_bool, mali_bool=mali_bool)
+    plot_people_bar_graph(filtered_director_counts, "director", audun_bool=audun_bool, mali_bool=mali_bool)
+    plot_people_bar_graph(filtered_writer_counts, "writer", audun_bool=audun_bool, mali_bool=mali_bool)
+    plot_people_bar_graph(filtered_composer_counts, "composer", audun_bool=audun_bool, mali_bool=mali_bool)
 
     print(f"The 20 actors I have seen the most movies with:\n{filtered_actor_counts}")
     print(f"The 20 directors I have seen the most movies with:\n{filtered_director_counts}")
@@ -130,5 +130,7 @@ def main_all():
     return None
 
 if __name__=='__main__':
-    main_rated()
-    main_all()
+    audun_bool = input("Is this for Audun? (y/n): ").lower() == 'y'
+    mali_bool = input("Is this for Mali? (y/n): ").lower() == 'y'
+    main_rated(audun_bool=audun_bool, mali_bool=mali_bool)
+    main_all(audun_bool=audun_bool, mali_bool=mali_bool)

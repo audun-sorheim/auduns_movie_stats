@@ -136,4 +136,6 @@ def main(audun_bool=True, mali_bool=False):
     print(f"✅ Metadata appended and saved to {dir}/ltrbxd_all_films_with_metadata.csv")
 
 if __name__ == "__main__":
-    main(audun_bool=True, mali_bool=False)
+    audun_bool = input("Is this for Audun? (y/n): ").lower() == 'y'
+    mali_bool = input("Is this for Mali? (y/n): ").lower() == 'y'
+    main(audun_bool=audun_bool, mali_bool=mali_bool)
