@@ -99,7 +99,7 @@ def main(dir):
 
     df = load_all_data(dir)
 
-    for col in ["Directors", "Writers", "Composers", "Cast", "IMDbRating", "Metascore"]:
+    for col in ["Directors", "Writers", "Composers", "Cast", "IMDbRating", "Metascore", "Origin_country", "Original_language"]:
         if col not in df.columns:
             df[col] = ""
 
@@ -119,7 +119,7 @@ def main(dir):
 
     df = load_rated_data(dir)
 
-    for col in ["Directors", "Writers", "Composers", "Cast", "IMDbRating", "Metascore"]:
+    for col in ["Directors", "Writers", "Composers", "Cast", "IMDbRating", "Metascore", "Origin_country", "Original_language"]:
         if col not in df.columns:
             df[col] = ""
 
