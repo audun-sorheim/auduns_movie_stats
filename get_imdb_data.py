@@ -32,10 +32,10 @@ def extract_metadata(movie):
         "Year": movie.get('year')
     }
 
-def main():
+def main(dir):
     # Load your Letterboxd CSV (adjust column names if needed)
-    df = pd.read_csv("watched.csv")
-    
+    df = pd.read_csv(f"{dir}/watched.csv")
+
     results = []
     for _, row in df.iterrows():
         title = row["Name"]
@@ -56,8 +56,44 @@ def main():
 
     # Save results to CSV
     results_df = pd.DataFrame(results)
-    results_df.to_csv("ltrbxd_all_films.csv", index=False)
-    print("Export complete: ltrbxd_all_films.csv")
+    results_df.to_csv(f"{dir}/ltrbxd_all_films.csv", index=False)
+    print(f"Export complete: {dir}/ltrbxd_all_films.csv")
+
+    df = pd.read_csv(f"{dir}/ratings.csv")
+
+    results = []
+    for _, row in df.iterrows():
+        title = row["Name"]
+        year = row["Year"]
+        rating = row["Rating"]
+
+        try:
+            movie = search_movie(title, year)
+            if movie:
+                metadata = extract_metadata(movie)
+                metadata["Rating"] = rating
+                results.append(metadata)
+                print(f"✅ Found: {title} ({year})")
+            else:
+                print(f"❌ Not found: {title} ({year})")
+        except Exception as e:
+            print(f"⚠️ Error with {title} ({year}): {e}")
+
+        time.sleep(0.1)  # be nice to IMDb servers
+
+    # Save results to CSV
+    results_df = pd.DataFrame(results)
+    results_df.to_csv(f"{dir}/ltrbxd_rated_films.csv", index=False)
+    print(f"Export complete: {dir}/ltrbxd_rated_films.csv")
+
 
 if __name__ == "__main__":
-    main()
+    audun_bool = input("Is this for Audun? (y/n): ").lower() == 'y'
+    mali_bool = input("Is this for Mali? (y/n): ").lower() == 'y'
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+    main(dir)

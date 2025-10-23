@@ -117,6 +117,26 @@ def main(dir):
     df.to_csv(f"{dir}/ltrbxd_all_films_with_metadata.csv", index=False)
     print(f"✅ Metadata appended and saved to {dir}/ltrbxd_all_films_with_metadata.csv")
 
+    df = load_rated_data(dir)
+
+    for col in ["Directors", "Writers", "Composer", "Cast", "IMDbRating", "Metascore"]:
+        if col not in df.columns:
+            df[col] = ""
+
+    for idx, row in tqdm.tqdm(df.iterrows(), total=len(df)):
+        imdb_id = str(row["imdbID"])
+        # print(f"Fetching metadata for {row['Title']} ({row['Year']})...")
+
+        metadata = fetch_metadata(imdb_id)
+
+        for key, value in metadata.items():
+            if key in df.columns:
+                df.at[idx, key] = value
+
+    # Save enriched dataframe
+    df.to_csv(f"{dir}/ltrbxd_rated_films_with_metadata.csv", index=False)
+    print(f"✅ Metadata appended and saved to {dir}/ltrbxd_rated_films_with_metadata.csv")
+
 if __name__ == "__main__":
     audun_bool = input("Is this for Audun? (y/n): ").lower() == 'y'
     mali_bool = input("Is this for Mali? (y/n): ").lower() == 'y'
