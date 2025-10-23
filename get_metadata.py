@@ -87,16 +87,35 @@ def fetch_metadata(imdb_id):
     metadata = {**tmdb_data, **omdb_data, **extra_data}
     return metadata
 
-def load_all_data():
-    df = pd.read_csv("ltrbxd_all_films.csv")
+def load_all_data(audun_bool=True, mali_bool=False):
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+    df = pd.read_csv(f"{dir}/ltrbxd_all_films.csv")
     return df
 
-def load_rated_data():
-    df = pd.read_csv("ltrbxd_rated_films.csv")
+def load_rated_data(audun_bool=True, mali_bool=False):
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+    df = pd.read_csv(f"{dir}/ltrbxd_rated_films.csv")
     return df
 
-def main():
-    df = load_all_data()
+def main(audun_bool=True, mali_bool=False):
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+
+    df = load_all_data(audun_bool=audun_bool, mali_bool=mali_bool)
 
     for col in ["Directors", "Writers", "Composer", "Cast", "IMDbRating", "Metascore"]:
         if col not in df.columns:
@@ -113,8 +132,8 @@ def main():
                 df.at[idx, key] = value
 
     # Save enriched dataframe
-    df.to_csv("ltrbxd_all_films_with_metadata.csv", index=False)
-    print("✅ Metadata appended and saved to ltrbxd_all_films_with_metadata.csv")
+    df.to_csv(f"{dir}/ltrbxd_all_films_with_metadata.csv", index=False)
+    print(f"✅ Metadata appended and saved to {dir}/ltrbxd_all_films_with_metadata.csv")
 
 if __name__ == "__main__":
-    main()
+    main(audun_bool=True, mali_bool=False)
