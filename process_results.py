@@ -6,25 +6,42 @@ import collections
 import geopandas as gpd
 import country_converter as coco
 
-def load_rated_dataframe():
-    return pd.read_csv("ltrbxd_rated_films_with_metadata.csv")
+def load_rated_dataframe(audun_bool=True, mali_bool=False):
+    if audun_bool:
+        return pd.read_csv("audun/ltrbxd_rated_films_with_metadata.csv")
+    elif mali_bool:
+        return pd.read_csv("mali/ltrbxd_rated_films_with_metadata.csv")
+    else:
+        raise FileNotFoundError("Could not find csv-file for specified user.")
 
-def load_all_dataframe():
-    return pd.read_csv("ltrbxd_all_films_with_metadata.csv")
+def load_all_dataframe(audun_bool=True, mali_bool=False):
+    if audun_bool:
+        return pd.read_csv("audun/ltrbxd_all_films_with_metadata.csv")
+    elif mali_bool:
+        return pd.read_csv("mali/ltrbxd_all_films_with_metadata.csv")
+    else:
+        raise FileNotFoundError("Could not find csv-file for specified user.")
 
-def plot_rated_ratings(ratings, imdb_ratings, metascore):
+def plot_rated_ratings(ratings, imdb_ratings, metascore, audun_bool=True, mali_bool=False):
     imdb_ratings /= 2
     metascore /= 20
 
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+
     bins = np.arange(0.5, 6.0, 0.5)
 
-    os.makedirs("plots", exist_ok=True)
+    os.makedirs(f"plots/{dir}", exist_ok=True)
 
     plt.figure()
     plt.hist(ratings, bins=bins, label="ratings", alpha=1)
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
-    plt.savefig("plots/rated_films_ratings_hist.png")
+    plt.savefig(f"plots/{dir}/rated_films_ratings_hist.png")
     plt.close()
 
     plt.figure()
@@ -33,7 +50,7 @@ def plot_rated_ratings(ratings, imdb_ratings, metascore):
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
     plt.legend()
-    plt.savefig("plots/rated_films_ratings_vs_IMDb_hist.png")
+    plt.savefig(f"plots/{dir}/rated_films_ratings_vs_IMDb_hist.png")
     plt.close()
 
     plt.figure()
@@ -42,7 +59,7 @@ def plot_rated_ratings(ratings, imdb_ratings, metascore):
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
     plt.legend()
-    plt.savefig("plots/rated_films_ratings_vs_metascore_hist.png")
+    plt.savefig(f"plots/{dir}/rated_films_ratings_vs_metascore_hist.png")
     plt.close()
 
     plt.figure()
@@ -52,17 +69,24 @@ def plot_rated_ratings(ratings, imdb_ratings, metascore):
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
     plt.legend()
-    plt.savefig("plots/rated_films_all_ratings_hist.png")
+    plt.savefig(f"plots/{dir}/rated_films_all_ratings_hist.png")
     plt.close()
 
-def plot_all_ratings(imdb_ratings, metascore):
+def plot_all_ratings(imdb_ratings, metascore, audun_bool=True, mali_bool=False):
 
     imdb_ratings /= 2
     metascore /= 20
 
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+    
     bins = np.arange(0.5, 6.0, 0.5)
 
-    os.makedirs("plots", exist_ok=True)
+    os.makedirs(f"plots/{dir}", exist_ok=True)
 
     plt.figure()
     plt.hist(imdb_ratings, bins=bins, label="IMDb ratings", alpha=0.3)
@@ -70,13 +94,21 @@ def plot_all_ratings(imdb_ratings, metascore):
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
     plt.legend()
-    plt.savefig("plots/IMDb_vs_metascore_hist.png")
+    plt.savefig(f"plots/{dir}/IMDb_vs_metascore_hist.png")
     plt.close()
 
-def plot_people_bar_graph(people_counts, people_type):
+def plot_people_bar_graph(people_counts, people_type, audun_bool=True, mali_bool=False):
+
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+    
     people = [el[0] for el in people_counts]
     counts = [el[1] for el in people_counts]
-    os.makedirs("plots", exist_ok=True)
+    os.makedirs(f"plots/{dir}", exist_ok=True)
 
     plt.figure(figsize=(12,6))
     bars = plt.bar(people, counts, width=0.7, color="steelblue", edgecolor="black")
@@ -87,10 +119,16 @@ def plot_people_bar_graph(people_counts, people_type):
     plt.yticks(fontsize=10)
     plt.grid(axis="y", linestyle="--", alpha=0.7)
     plt.tight_layout()
-    plt.savefig(f"plots/{people_type}_frequency.png", dpi=300)
+    plt.savefig(f"plots/{dir}/{people_type}_frequency.png", dpi=300)
     plt.close()
 
-def plot_world_map(df):
+def plot_world_map(df, audun_bool=True, mali_bool=False):
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
     df_countries = (
     df["OriginCountry"]
     .str.split(", ")
@@ -118,12 +156,19 @@ def plot_world_map(df):
 
     ax.set_title("Movies by Country (from TMDb origin_country)", fontsize=16)
     ax.axis("off")
-    plt.savefig("plots/world_plot.png")
+    plt.savefig(f"plots/{dir}/world_plot.png")
 
     return None
 
-def plot_contrarian_bars(rating_diffs, title, filename):
-    os.makedirs("plots", exist_ok=True)
+def plot_contrarian_bars(rating_diffs, title, filename, audun_bool=True, mali_bool=False):
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+
+    os.makedirs(f"plots/{dir}", exist_ok=True)
 
     people = list(rating_diffs.keys())[:10]
     diffs = list(rating_diffs.values())[:10]
@@ -137,20 +182,26 @@ def plot_contrarian_bars(rating_diffs, title, filename):
     plt.yticks(fontsize=10)
     plt.grid(axis="y", linestyle="--", alpha=0.7)
     plt.tight_layout()
-    plt.savefig(f"plots/{filename}.png", dpi=300)
+    plt.savefig(f"plots/{dir}/{filename}.png", dpi=300)
     plt.close()
 
-def plot_year_histogram(years):
+def plot_year_histogram(years, audun_bool=True, mali_bool=False):
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
     bins = np.arange(1940, 2026, 5)
     print(bins)
 
-    os.makedirs("plots", exist_ok=True)
+    os.makedirs(f"plots/{dir}", exist_ok=True)
 
     plt.figure()
     plt.hist(years, bins=bins, label="years", alpha=1)
     plt.xlim((np.min(years)-1, np.max(years)+1))
     plt.xticks(bins[:-1], labels=bins[:-1], rotation=45)
-    plt.savefig("plots/films_years_hist.png")
+    plt.savefig(f"plots/{dir}/films_years_hist.png")
     plt.close()
 
 def process_people(peoples):
