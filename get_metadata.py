@@ -47,7 +47,7 @@ def fetch_tmdb_data(imdb_id):
 
     directors = [d["name"] for d in r["crew"] if d["job"]=="Director"]
     writers = [w["name"] for w in r["crew"] if w["job"] in ("Writer","Screenplay")]
-    composer = [c["name"] for c in r["crew"] if c["job"]=="Original Music Composer"]
+    composer = [c["name"] for c in r["crew"] if c["job"] in ("Original Music Composer", "Music", "Composer", "Score Composer")]
     cast = [a["name"] for a in r["cast"][:100]] # Limit to 100 top billed cast
     countries = ", ".join(r_full.get("origin_country", [])) 
     language = r_full.get("original_language")
@@ -99,7 +99,7 @@ def main(dir):
 
     df = load_all_data(dir)
 
-    for col in ["Directors", "Writers", "Composer", "Cast", "IMDbRating", "Metascore"]:
+    for col in ["Directors", "Writers", "Composers", "Cast", "IMDbRating", "Metascore"]:
         if col not in df.columns:
             df[col] = ""
 
