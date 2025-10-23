@@ -37,15 +37,20 @@ def main(dir):
     df = pd.read_csv(f"{dir}/watched.csv")
 
     results = []
+    results_rating = []
     for _, row in df.iterrows():
         title = row["Name"]
         year = row["Year"]
+        rating = row["Rating"]
 
         try:
             movie = search_movie(title, year)
             if movie:
                 metadata = extract_metadata(movie)
+                metadata_rating = metadata.copy()
+                metadata_rating["Rating"] = rating
                 results.append(metadata)
+                results_rating.append(metadata_rating)
                 print(f"✅ Found: {title} ({year})")
             else:
                 print(f"❌ Not found: {title} ({year})")
@@ -58,32 +63,8 @@ def main(dir):
     results_df = pd.DataFrame(results)
     results_df.to_csv(f"{dir}/ltrbxd_all_films.csv", index=False)
     print(f"Export complete: {dir}/ltrbxd_all_films.csv")
-
-    df = pd.read_csv(f"{dir}/ratings.csv")
-
-    results = []
-    for _, row in df.iterrows():
-        title = row["Name"]
-        year = row["Year"]
-        rating = row["Rating"]
-
-        try:
-            movie = search_movie(title, year)
-            if movie:
-                metadata = extract_metadata(movie)
-                metadata["Rating"] = rating
-                results.append(metadata)
-                print(f"✅ Found: {title} ({year})")
-            else:
-                print(f"❌ Not found: {title} ({year})")
-        except Exception as e:
-            print(f"⚠️ Error with {title} ({year}): {e}")
-
-        time.sleep(0.1)  # be nice to IMDb servers
-
-    # Save results to CSV
-    results_df = pd.DataFrame(results)
-    results_df.to_csv(f"{dir}/ltrbxd_rated_films.csv", index=False)
+    results_df_rating = pd.DataFrame(results_rating)
+    results_df_rating.to_csv(f"{dir}/ltrbxd_rated_films.csv", index=False)
     print(f"Export complete: {dir}/ltrbxd_rated_films.csv")
 
 
