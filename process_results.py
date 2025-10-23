@@ -6,32 +6,15 @@ import collections
 import geopandas as gpd
 import country_converter as coco
 
-def load_rated_dataframe(audun_bool=True, mali_bool=False):
-    if audun_bool:
-        return pd.read_csv("audun/ltrbxd_rated_films_with_metadata.csv")
-    elif mali_bool:
-        return pd.read_csv("mali/ltrbxd_rated_films_with_metadata.csv")
-    else:
-        raise FileNotFoundError("Could not find csv-file for specified user.")
+def load_rated_dataframe(dir):
+    return pd.read_csv(f"{dir}/ltrbxd_rated_films_with_metadata.csv")
 
-def load_all_dataframe(audun_bool=True, mali_bool=False):
-    if audun_bool:
-        return pd.read_csv("audun/ltrbxd_all_films_with_metadata.csv")
-    elif mali_bool:
-        return pd.read_csv("mali/ltrbxd_all_films_with_metadata.csv")
-    else:
-        raise FileNotFoundError("Could not find csv-file for specified user.")
+def load_all_dataframe(dir):
+    return pd.read_csv(f"{dir}/ltrbxd_all_films_with_metadata.csv")
 
-def plot_rated_ratings(ratings, imdb_ratings, metascore, audun_bool=True, mali_bool=False):
+def plot_rated_ratings(ratings, imdb_ratings, metascore, dir):
     imdb_ratings /= 2
     metascore /= 20
-
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
 
     bins = np.arange(0.5, 6.0, 0.5)
 
@@ -72,17 +55,10 @@ def plot_rated_ratings(ratings, imdb_ratings, metascore, audun_bool=True, mali_b
     plt.savefig(f"plots/{dir}/rated_films_all_ratings_hist.png")
     plt.close()
 
-def plot_all_ratings(imdb_ratings, metascore, audun_bool=True, mali_bool=False):
+def plot_all_ratings(imdb_ratings, metascore, dir):
 
     imdb_ratings /= 2
     metascore /= 20
-
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
     
     bins = np.arange(0.5, 6.0, 0.5)
 
@@ -97,14 +73,7 @@ def plot_all_ratings(imdb_ratings, metascore, audun_bool=True, mali_bool=False):
     plt.savefig(f"plots/{dir}/IMDb_vs_metascore_hist.png")
     plt.close()
 
-def plot_people_bar_graph(people_counts, people_type, audun_bool=True, mali_bool=False):
-
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
+def plot_people_bar_graph(people_counts, people_type, dir):
     
     people = [el[0] for el in people_counts]
     counts = [el[1] for el in people_counts]
@@ -122,13 +91,7 @@ def plot_people_bar_graph(people_counts, people_type, audun_bool=True, mali_bool
     plt.savefig(f"plots/{dir}/{people_type}_frequency.png", dpi=300)
     plt.close()
 
-def plot_world_map(df, audun_bool=True, mali_bool=False):
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
+def plot_world_map(df, dir):
     df_countries = (
     df["OriginCountry"]
     .str.split(", ")
@@ -160,13 +123,7 @@ def plot_world_map(df, audun_bool=True, mali_bool=False):
 
     return None
 
-def plot_contrarian_bars(rating_diffs, title, filename, audun_bool=True, mali_bool=False):
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
+def plot_contrarian_bars(rating_diffs, title, filename, dir):
 
     os.makedirs(f"plots/{dir}", exist_ok=True)
 
@@ -185,13 +142,7 @@ def plot_contrarian_bars(rating_diffs, title, filename, audun_bool=True, mali_bo
     plt.savefig(f"plots/{dir}/{filename}.png", dpi=300)
     plt.close()
 
-def plot_year_histogram(years, audun_bool=True, mali_bool=False):
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
+def plot_year_histogram(years, dir):
     bins = np.arange(1940, 2026, 5)
     print(bins)
 

@@ -87,35 +87,17 @@ def fetch_metadata(imdb_id):
     metadata = {**tmdb_data, **omdb_data, **extra_data}
     return metadata
 
-def load_all_data(audun_bool=True, mali_bool=False):
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
+def load_all_data(dir):
     df = pd.read_csv(f"{dir}/ltrbxd_all_films.csv")
     return df
 
-def load_rated_data(audun_bool=True, mali_bool=False):
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
+def load_rated_data(dir):
     df = pd.read_csv(f"{dir}/ltrbxd_rated_films.csv")
     return df
 
-def main(audun_bool=True, mali_bool=False):
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
+def main(dir):
 
-    df = load_all_data(audun_bool=audun_bool, mali_bool=mali_bool)
+    df = load_all_data(dir)
 
     for col in ["Directors", "Writers", "Composer", "Cast", "IMDbRating", "Metascore"]:
         if col not in df.columns:
@@ -138,4 +120,10 @@ def main(audun_bool=True, mali_bool=False):
 if __name__ == "__main__":
     audun_bool = input("Is this for Audun? (y/n): ").lower() == 'y'
     mali_bool = input("Is this for Mali? (y/n): ").lower() == 'y'
-    main(audun_bool=audun_bool, mali_bool=mali_bool)
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+    main(dir)

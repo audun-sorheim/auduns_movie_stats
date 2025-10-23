@@ -39,17 +39,10 @@ def get_info(df):
 
     return countries, languages
 
-def main(audun_bool=True, mali_bool=False):
+def main(dir):
 
-    if audun_bool:
-        dir = "audun"
-    elif mali_bool:
-        dir = "mali"
-    else:
-        raise ValueError("Invalid user specified.")
-
-    df_all = load_all_dataframe(audun_bool=audun_bool, mali_bool=mali_bool)
-    df_rated = load_rated_dataframe(audun_bool=audun_bool, mali_bool=mali_bool)
+    df_all = load_all_dataframe(dir)
+    df_rated = load_rated_dataframe(dir)
 
     all_countries, all_languages = get_info(df_all)
     rated_countries, rated_languages = get_info(df_rated)
@@ -67,4 +60,10 @@ def main(audun_bool=True, mali_bool=False):
 if __name__ == '__main__':
     audun_bool = input("Is this for Audun? (y/n): ").lower() == 'y'
     mali_bool = input("Is this for Mali? (y/n): ").lower() == 'y'
-    main(audun_bool=audun_bool, mali_bool=mali_bool)
+    if audun_bool:
+        dir = "audun"
+    elif mali_bool:
+        dir = "mali"
+    else:
+        raise ValueError("Invalid user specified.")
+    main(dir)
