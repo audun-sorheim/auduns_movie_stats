@@ -60,8 +60,8 @@ def fetch_tmdb_data(imdb_id):
             "Composers": ", ".join(composer),
             "Cast": ", ".join(cast)
             }, {
-            "Origin_country": origin_country, 
-            "Original_language": orig_language
+            "OriginCountry": origin_country, 
+            "OriginalLanguage": orig_language
             }
 
 def fetch_omdb_data(imdb_id):
