@@ -81,7 +81,6 @@ def main_all(dir):
     plot_world_map(df_all, dir=dir)
 
     year_counts = df_all["Year"].value_counts().sort_index()
-    print(df_all["Year"].values)
     plot_year_histogram(df_all["Year"].values, dir=dir)
     # print(f"Number of films seen per year:\n{plotyear_counts}\n")
 
@@ -92,10 +91,10 @@ def main_all(dir):
     lang_counts = get_person_counts(df_all["OriginalLanguage"].copy())
     coun_counts = get_person_counts(df_all["OriginCountry"].copy())
 
-    filtered_actor_counts = [(actor, count) for actor, count in actor_counts.most_common() if count >= 10]
-    filtered_director_counts = [(director, count) for director, count in director_counts.most_common() if count >= 3]
-    filtered_writer_counts = [(writer, count) for writer, count in writer_counts.most_common() if count >= 4]
-    filtered_composer_counts = [(composer, count) for composer, count in composer_counts.most_common() if count >= 4]
+    filtered_actor_counts = [(actor, count) for actor, count in actor_counts.most_common(10)]
+    filtered_director_counts = [(director, count) for director, count in director_counts.most_common(10)]
+    filtered_writer_counts = [(writer, count) for writer, count in writer_counts.most_common(10)]
+    filtered_composer_counts = [(composer, count) for composer, count in composer_counts.most_common(10)]
 
     plot_people_bar_graph(filtered_actor_counts, "actor", dir=dir)
     plot_people_bar_graph(filtered_director_counts, "director", dir=dir)
