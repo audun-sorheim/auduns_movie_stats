@@ -144,7 +144,6 @@ def plot_contrarian_bars(rating_diffs, title, filename, dir):
 
 def plot_year_histogram(years, dir):
     bins = np.arange(1940, 2026, 5)
-    print(bins)
 
     os.makedirs(f"plots/{dir}", exist_ok=True)
 
