@@ -19,22 +19,10 @@ def main_rated(dir):
     ratings = df_rated["Rating"]
     imdb_ratings = df_rated["IMDbRating"]
     metascores = df_rated["Metascore"]
-    print(metascores)
     metascores_nonnan = metascores.dropna()
-    # print(metascores)
-    # print(imdb_ratings)
+    print(imdb_ratings)
 
-    plot_rated_ratings(ratings, imdb_ratings, metascores_nonnan, dir=dir)
-
-    actor_counts = get_person_counts(df_rated["Cast"].copy())
-    director_counts = get_person_counts(df_rated["Directors"].copy())
-    writer_counts = get_person_counts(df_rated["Writers"].copy())
-    composer_counts = get_person_counts(df_rated["Composers"].copy())
-    # print(f"The 20 actors I have seen the most movies with:\n{actor_counts.most_common(20)}")
-    # print(f"The 20 directors I have seen the most movies with:\n{director_counts.most_common(20)}")
-    # print(f"The 20 writers I have seen the most movies with:\n{writer_counts.most_common(20)}")
-    # print(f"The 20 composers I have seen the most movies with:\n{composer_counts.most_common(20)}")
-
+    plot_rated_ratings(ratings, np.copy(imdb_ratings)/2, np.copy(metascores_nonnan)/20, dir=dir)
 
     rating_diff_public = np.array([], dtype=np.float64)
     rating_diff_critics = np.array([], dtype=np.float64)
@@ -42,12 +30,13 @@ def main_rated(dir):
         if np.isnan(imdb_rating):
             rating_diff_public =  np.append(rating_diff_public, 0.0)
         else:
-            rating_diff_public = np.append(rating_diff_public, np.round(ratings[i] - imdb_rating, 3))
+            print(ratings[i], imdb_rating)
+            rating_diff_public = np.append(rating_diff_public, np.round(ratings[i] - imdb_rating/2, 3))
     for i, metascore in enumerate(metascores):
         if np.isnan(metascore):
             rating_diff_critics = np.append(rating_diff_critics, 0.0)
         else:
-            rating_diff_critics = np.append(rating_diff_critics, np.round(ratings[i] - metascore, 3))
+            rating_diff_critics = np.append(rating_diff_critics, np.round(ratings[i] - metascore/20, 3))
 
     rating_diff_public_dict = dict(key for key in zip(df_rated["Title"], rating_diff_public))
     rating_diff_critics_dict = dict(key for key in zip(df_rated["Title"], rating_diff_critics))
@@ -55,15 +44,13 @@ def main_rated(dir):
     negative_rating_diff_public_sorted = dict(sorted(rating_diff_public_dict.items(), key=lambda item: item[1]))
     positive_rating_diff_critics_sorted = dict(sorted(rating_diff_critics_dict.items(), key=lambda item: item[1], reverse=True))
     negative_rating_diff_critics_sorted = dict(sorted(rating_diff_critics_dict.items(), key=lambda item: item[1]))
-    print(positive_rating_diff_critics_sorted)
+    print(positive_rating_diff_public_sorted)
     print(df_rated["Title"][np.nanargmax(rating_diff_public)], np.round(rating_diff_public[np.nanargmax(rating_diff_public)], 2))
     print(df_rated["Title"][np.nanargmin(rating_diff_public)], rating_diff_public[np.nanargmin(rating_diff_public)])
     print(df_rated["Title"][np.nanargmax(rating_diff_critics)], rating_diff_critics[np.nanargmax(rating_diff_critics)])
     print(df_rated["Title"][np.nanargmin(rating_diff_critics)], rating_diff_critics[np.nanargmin(rating_diff_critics)])
     print(df_rated["Title"][np.where(np.abs(rating_diff_public)<0.001)[0]])
     print(df_rated["Title"][np.where(np.abs(rating_diff_critics)<0.001)[0]])
-    rating_diff_public = rating_diff_public[~np.isnan(rating_diff_public)]
-    rating_diff_critics = rating_diff_critics[~np.isnan(rating_diff_critics)]
     avg_rating_diff_public = np.round(np.mean(rating_diff_public),3)
     avg_rating_diff_critics = np.round(np.mean(rating_diff_critics),3)
     median_rating_diff_public = np.round(np.median(rating_diff_public),2)
