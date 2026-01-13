@@ -13,8 +13,6 @@ def load_all_dataframe(dir):
     return pd.read_csv(f"{dir}/ltrbxd_all_films_with_metadata.csv")
 
 def plot_rated_ratings(ratings, imdb_ratings, metascore, dir):
-    imdb_ratings /= 2
-    metascore /= 20
 
     bins = np.arange(0.5, 6.0, 0.5)
 
