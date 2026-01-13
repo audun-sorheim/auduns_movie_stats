@@ -3,6 +3,7 @@ import pandas as pd
 import tqdm
 import langcodes
 import country_converter as coco
+import numpy as np
 
 TMDB_API_KEY = "c4e8c4ca2a6f4c6411dc47aca067218f"
 OMDB_API_KEY = "7a043e00"
@@ -74,10 +75,13 @@ def fetch_omdb_data(imdb_id):
         if "limit" in r.get("Error", "").lower():
             print("⚠️ OMDb daily request limit reached. Try again tomorrow.")
             return {}
+    
+    imdb_rating = r.get("imdbRating") or "N/A"
+    metascore = r.get("Metascore") or "N/A"
 
     return {
-        "IMDbRating": r.get("imdbRating"),
-        "Metascore": r.get("Metascore")
+        "IMDbRating": imdb_rating,
+        "Metascore": metascore
     }
 
 def fetch_metadata(imdb_id):
