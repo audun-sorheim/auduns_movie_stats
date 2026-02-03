@@ -114,29 +114,29 @@ def load_rated_data(dir):
 
 def main(dir):
 
-    # df = load_all_data(dir)
+    df = load_all_data(dir)
 
-    # for col in ["Directors", "Writers", "Composers", "Cast", "Genres", "IMDbRating", "Metascore", "OriginCountry", "OriginalLanguage"]:
-    #     if col not in df.columns:
-    #         df[col] = ""
+    for col in ["Directors", "Writers", "Composers", "Cast", "Genres", "OriginCountry", "OriginalLanguage", "IMDbRating", "Metascore"]:
+        if col not in df.columns:
+            df[col] = ""
 
-    # for idx, row in tqdm.tqdm(df.iterrows(), total=len(df)):
-    #     imdb_id = str(row["imdbID"])
-    #     # print(f"Fetching metadata for {row['Title']} ({row['Year']})...")
+    for idx, row in tqdm.tqdm(df.iterrows(), total=len(df)):
+        imdb_id = str(row["imdbID"])
+        # print(f"Fetching metadata for {row['Title']} ({row['Year']})...")
 
-    #     metadata = fetch_metadata(imdb_id)
+        metadata = fetch_metadata(imdb_id)
 
-    #     for key, value in metadata.items():
-    #         if key in df.columns:
-    #             df.at[idx, key] = value
+        for key, value in metadata.items():
+            if key in df.columns:
+                df.at[idx, key] = value
 
-    # # Save enriched dataframe
-    # df.to_csv(f"{dir}/ltrbxd_all_films_with_metadata.csv", index=False)
-    # print(f"✅ Metadata appended and saved to {dir}/ltrbxd_all_films_with_metadata.csv")
+    # Save enriched dataframe
+    df.to_csv(f"{dir}/ltrbxd_all_films_with_metadata.csv", index=False)
+    print(f"✅ Metadata appended and saved to {dir}/ltrbxd_all_films_with_metadata.csv")
 
     df = load_rated_data(dir)
 
-    for col in ["Directors", "Writers", "Composers", "Cast", "Genres", "IMDbRating", "Metascore", "OriginCountry", "OriginalLanguage"]:
+    for col in ["Directors", "Writers", "Composers", "Cast", "Genres", "OriginCountry", "OriginalLanguage", "IMDbRating", "Metascore"]:
         if col not in df.columns:
             df[col] = ""
 
