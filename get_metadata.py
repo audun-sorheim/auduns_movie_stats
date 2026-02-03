@@ -6,7 +6,8 @@ import country_converter as coco
 import numpy as np
 
 TMDB_API_KEY = "c4e8c4ca2a6f4c6411dc47aca067218f"
-OMDB_API_KEY = "bad0c5a9"
+# OMDB_API_KEY = "bad0c5a9"
+OMDB_API_KEY = "33fec61e"
 
 def process_data(orig_country, orig_language):
 
