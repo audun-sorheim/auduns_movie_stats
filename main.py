@@ -64,33 +64,36 @@ def main_rated(dir):
     plot_contrarian_bars(positive_rating_diff_critics_sorted, "Positive rating difference vs Metascore", "pos_rating_diff_critics", dir=dir)
     plot_contrarian_bars(negative_rating_diff_critics_sorted, "Negative rating difference vs Metascore", "neg_rating_diff_critics", dir=dir)
 
-    composer_ratings, composer_avg_ratings, composer_median_ratings = get_people_ratings(df_rated, "Composers", True)
-    actor_ratings, actor_avg_ratings, actor_median_ratings = get_people_ratings(df_rated, "Cast", True)
-    director_ratings, director_avg_ratings, director_median_ratings = get_people_ratings(df_rated, "Directors", True)
-    writer_ratings, writer_avg_ratings, writer_median_ratings = get_people_ratings(df_rated, "Writers", True)
-    genre_ratings, genre_avg_ratings, genre_median_ratings = get_people_ratings(df_rated, "Genres", True)
+    composer_ratings, composer_avg_ratings, composer_median_ratings = get_people_ratings(df_rated, "Composers", True, num=NUM)
+    actor_ratings, actor_avg_ratings, actor_median_ratings = get_people_ratings(df_rated, "Cast", True, num=NUM)
+    director_ratings, director_avg_ratings, director_median_ratings = get_people_ratings(df_rated, "Directors", True, num=NUM)
+    writer_ratings, writer_avg_ratings, writer_median_ratings = get_people_ratings(df_rated, "Writers", True, num=NUM)
+    genre_ratings, genre_avg_ratings, genre_median_ratings = get_people_ratings(df_rated, "Genres", True, num=NUM)
     
-    composer_ratings, composer_avg_ratings_low, composer_median_ratings_low = get_people_ratings(df_rated, "Composers", False)
-    actor_ratings, actor_avg_ratings_low, actor_median_ratings_low = get_people_ratings(df_rated, "Cast", False)
-    director_ratings, director_avg_ratings_low, director_median_ratings_low = get_people_ratings(df_rated, "Directors", False)
-    writer_ratings, writer_avg_ratings_low, writer_median_ratings_low = get_people_ratings(df_rated, "Writers", False)
-    genre_ratings, genre_avg_ratings_low, genre_median_ratings_low = get_people_ratings(df_rated, "Genres", False)
+    composer_ratings, composer_avg_ratings_low, composer_median_ratings_low = get_people_ratings(df_rated, "Composers", False, num=NUM)
+    actor_ratings, actor_avg_ratings_low, actor_median_ratings_low = get_people_ratings(df_rated, "Cast", False, num=NUM)
+    director_ratings, director_avg_ratings_low, director_median_ratings_low = get_people_ratings(df_rated, "Directors", False, num=NUM)
+    writer_ratings, writer_avg_ratings_low, writer_median_ratings_low = get_people_ratings(df_rated, "Writers", False, num=NUM)
+    genre_ratings, genre_avg_ratings_low, genre_median_ratings_low = get_people_ratings(df_rated, "Genres", False, num=NUM)
 
     name = "Rachel McAdams"
     df_actor = df_rated[df_rated["Cast"].str.contains(name, na=False)][["Title", "Rating"]]
-    film_ratings = dict(zip(df_actor["Title"], df_actor["Rating"]))
-    print(f"{dir} has rated {len(actor_ratings[name])} {name} films:\n"
-          f"Average: {actor_avg_ratings[name]}\n"
-          f"Median: {actor_median_ratings[name]}\n"
-          f"{film_ratings}")
+    if len(df_actor["Title"]) >= NUM:
+        film_ratings = dict(zip(df_actor["Title"], df_actor["Rating"]))
+        print(f"{dir} has rated {len(actor_ratings[name])} {name} films:\n"
+            f"Average: {actor_avg_ratings[name]}\n"
+            f"Median: {actor_median_ratings[name]}\n"
+            f"{film_ratings}")
     
     name = "Matt Damon"
     df_actor = df_rated[df_rated["Cast"].str.contains(name, na=False)][["Title", "Rating"]]
-    film_ratings = dict(zip(df_actor["Title"], df_actor["Rating"]))
-    print(f"{dir} has rated {len(actor_ratings[name])} {name} films:\n"
-          f"Average: {actor_avg_ratings[name]}\n"
-          f"Median: {actor_median_ratings[name]}\n"
-          f"{film_ratings}")
+    if len(df_actor["Title"]) >= NUM:
+        film_ratings = dict(zip(df_actor["Title"], df_actor["Rating"]))
+        print(f"{dir} has rated {len(actor_ratings[name])} {name} films:\n"
+            f"Average: {actor_avg_ratings[name]}\n"
+            f"Median: {actor_median_ratings[name]}\n"
+            f"{film_ratings}")
+    
 
     # print(composer_avg_ratings)
     # print(actor_avg_ratings)
@@ -190,8 +193,10 @@ if __name__=='__main__':
     mali_bool = input("Is this for Mali? (y/n): ").lower() == 'y'
     if audun_bool:
         dir = "audun"
+        NUM=3
     elif mali_bool:
         dir = "mali"
+        NUM=3
     else:
         raise ValueError("Invalid user specified.")
     main_rated(dir)

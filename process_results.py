@@ -196,7 +196,7 @@ def get_ratings_medians(people_ratings_dict, reverse_bool):
     people_avg_ratings = {person: np.round(np.median(ratings), 1) for person, ratings in people_ratings_dict.items()}
     return {k: v for k, v in sorted(people_avg_ratings.items(), key=lambda item: item[1], reverse=reverse_bool)}
 
-def get_people_ratings(df, role, reverse_bool):
+def get_people_ratings(df, role, reverse_bool, num):
 
     if role not in df.columns:
         raise ValueError(f"Role '{role}' not found in DataFrame columns. Role must be one of {df.columns.tolist()}")
@@ -211,7 +211,7 @@ def get_people_ratings(df, role, reverse_bool):
                 people_ratings_dict[person] = []
             people_ratings_dict[person].append(row["Rating"])
 
-    people_ratings_dict = {person: ratings for person, ratings in people_ratings_dict.items() if len(ratings) >= 3}
+    people_ratings_dict = {person: ratings for person, ratings in people_ratings_dict.items() if len(ratings) >= num}
 
     people_avg_ratings = get_ratings_averages(people_ratings_dict, reverse_bool)
     people_median_ratings = get_ratings_medians(people_ratings_dict, reverse_bool)
