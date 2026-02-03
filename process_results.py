@@ -22,7 +22,7 @@ def plot_rated_ratings(ratings, imdb_ratings, metascore, dir):
     plt.hist(ratings, bins=bins, label="ratings", alpha=1)
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
-    plt.savefig(f"plots/{dir}/rated_films_ratings_hist.png")
+    plt.savefig(f"plots/{dir}/hists/rated_films_ratings_hist.png")
     plt.close()
 
     plt.figure()
@@ -31,7 +31,7 @@ def plot_rated_ratings(ratings, imdb_ratings, metascore, dir):
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
     plt.legend()
-    plt.savefig(f"plots/{dir}/rated_films_ratings_vs_IMDb_hist.png")
+    plt.savefig(f"plots/{dir}/hists/rated_films_ratings_vs_IMDb_hist.png")
     plt.close()
 
     plt.figure()
@@ -40,7 +40,7 @@ def plot_rated_ratings(ratings, imdb_ratings, metascore, dir):
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
     plt.legend()
-    plt.savefig(f"plots/{dir}/rated_films_ratings_vs_metascore_hist.png")
+    plt.savefig(f"plots/{dir}/hists/rated_films_ratings_vs_metascore_hist.png")
     plt.close()
 
     plt.figure()
@@ -50,7 +50,7 @@ def plot_rated_ratings(ratings, imdb_ratings, metascore, dir):
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
     plt.legend()
-    plt.savefig(f"plots/{dir}/rated_films_all_ratings_hist.png")
+    plt.savefig(f"plots/{dir}/hists/rated_films_all_ratings_hist.png")
     plt.close()
 
 def plot_all_ratings(imdb_ratings, metascore, dir):
@@ -68,7 +68,7 @@ def plot_all_ratings(imdb_ratings, metascore, dir):
     plt.xlim((0.5,5.5))
     plt.xticks(bins[:-1]+0.25, labels=bins[:-1])
     plt.legend()
-    plt.savefig(f"plots/{dir}/IMDb_vs_metascore_hist.png")
+    plt.savefig(f"plots/{dir}/hists/IMDb_vs_metascore_hist.png")
     plt.close()
 
 def plot_people_bar_graph(people_counts, people_type, dir):
@@ -86,7 +86,7 @@ def plot_people_bar_graph(people_counts, people_type, dir):
     plt.yticks(fontsize=10)
     plt.grid(axis="y", linestyle="--", alpha=0.7)
     plt.tight_layout()
-    plt.savefig(f"plots/{dir}/{people_type}_frequency.png", dpi=300)
+    plt.savefig(f"plots/{dir}/freqs/{people_type}_frequency.png", dpi=300)
     plt.close()
 
 def plot_world_map(df, dir):
@@ -137,7 +137,7 @@ def plot_contrarian_bars(rating_diffs, title, filename, dir):
     plt.yticks(fontsize=10)
     plt.grid(axis="y", linestyle="--", alpha=0.7)
     plt.tight_layout()
-    plt.savefig(f"plots/{dir}/{filename}.png", dpi=300)
+    plt.savefig(f"plots/{dir}/ratings/{filename}.png", dpi=300)
     plt.close()
 
 def plot_year_histogram(years, dir):
@@ -149,7 +149,7 @@ def plot_year_histogram(years, dir):
     plt.hist(years, bins=bins, label="years", alpha=1)
     plt.xlim((np.min(years)-1, np.max(years)+1))
     plt.xticks(bins[:-1], labels=bins[:-1], rotation=45)
-    plt.savefig(f"plots/{dir}/films_years_hist.png")
+    plt.savefig(f"plots/{dir}/hists/films_years_hist.png")
     plt.close()
 
 def process_people(peoples):
@@ -188,11 +188,15 @@ def person_films(df, person, role):
 
     return sorted(films)
 
-def get_ratings_averages(people_ratings_dict):
+def get_ratings_averages(people_ratings_dict, reverse_bool):
     people_avg_ratings = {person: np.round(np.mean(ratings), 3) for person, ratings in people_ratings_dict.items()}
-    return {k: v for k, v in sorted(people_avg_ratings.items(), key=lambda item: item[1], reverse=True)}
+    return {k: v for k, v in sorted(people_avg_ratings.items(), key=lambda item: item[1], reverse=reverse_bool)}
 
-def get_people_ratings(df, role):
+def get_ratings_medians(people_ratings_dict, reverse_bool):
+    people_avg_ratings = {person: np.round(np.median(ratings), 1) for person, ratings in people_ratings_dict.items()}
+    return {k: v for k, v in sorted(people_avg_ratings.items(), key=lambda item: item[1], reverse=reverse_bool)}
+
+def get_people_ratings(df, role, reverse_bool):
 
     if role not in df.columns:
         raise ValueError(f"Role '{role}' not found in DataFrame columns. Role must be one of {df.columns.tolist()}")
@@ -209,6 +213,24 @@ def get_people_ratings(df, role):
 
     people_ratings_dict = {person: ratings for person, ratings in people_ratings_dict.items() if len(ratings) >= 3}
 
-    people_avg_ratings = get_ratings_averages(people_ratings_dict)
+    people_avg_ratings = get_ratings_averages(people_ratings_dict, reverse_bool)
+    people_median_ratings = get_ratings_medians(people_ratings_dict, reverse_bool)
 
-    return people_ratings_dict, people_avg_ratings
+    return people_ratings_dict, people_avg_ratings, people_median_ratings
+
+def plot_rated_people(people_ratings, role, type, title, filename, dir):
+
+
+    people = [p for p in people_ratings.keys()][:15]
+    ratings = [r for r in people_ratings.values()][:15]
+    plt.figure(figsize=(12,6))
+    bars = plt.bar(people, ratings, width=0.7, color="salmon", edgecolor="black")
+    plt.title(title, fontsize=16, weight="bold")
+    plt.xlabel(f"{role}", fontsize=14)
+    plt.ylabel(f"{type} rating", fontsize=14)
+    plt.xticks(rotation=45, ha="right", fontsize=10)
+    plt.yticks(fontsize=10)
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.tight_layout()
+    plt.savefig(f"plots/{dir}/ratings/{filename}.png", dpi=300)
+    plt.close()
