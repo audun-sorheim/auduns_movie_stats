@@ -5,6 +5,8 @@ import os
 import collections
 import geopandas as gpd
 import country_converter as coco
+from collections import Counter
+import gender_guesser.detector as gg
 
 def load_rated_dataframe(dir):
     return pd.read_csv(f"{dir}/ltrbxd_rated_films_with_metadata.csv")
@@ -234,3 +236,132 @@ def plot_rated_people(people_ratings, role, type, title, filename, dir):
     plt.tight_layout()
     plt.savefig(f"plots/{dir}/ratings/{filename}.png", dpi=300)
     plt.close()
+
+def check_country(country):
+    if ',' in country:
+        country = country.split(', ')[0]
+    country = country.replace(' ', '_')
+
+    if country == 'south_korea':
+        country = 'korea'
+    elif country == 'united_states':
+        country = 'usa'
+    elif country == 'united_kingdom':
+        country = 'great_britain'
+    elif country == 'australia':
+        country = 'great_britain'
+    elif country == 'new_zealand':
+        country = 'great_britain'
+    elif country == 'czechia':
+        country = 'czech_republic'
+
+    return country
+
+def get_first_name(country, name):
+    if country == 'korea':
+        first_name = name.split(' ')[-1].split('-')[0]
+    else:
+        first_name = name.split(' ')[0]
+    return first_name
+
+def build_unique_set_of_workers(df_workers, countries):
+    workers_set = set()
+    for i, workers in enumerate(df_workers):
+        if type(workers) != str: 
+            continue
+        workers_list = workers.split(', ')
+        country = check_country(countries[i].lower())
+        for worker in workers_list:
+            if worker not in workers_set:
+                workers_set.add((worker, country))
+    return workers_set
+
+def count_unique_gender_in_workers(df, worker_type, gender_registry, countries):
+    workers_set = build_unique_set_of_workers(df[worker_type], countries)
+
+    if worker_type == "Cast":
+        gender_detector = gg.Detector()
+        gender_counter = Counter({'female': 0, 'male': 0, 'mostly_female': 0, 'mostly_male': 0, 'unknown': 0, 'andy': 0})
+    else:
+        gender_counter = Counter({'female': 0, 'male': 0})
+
+    for i, worker_and_country in enumerate(workers_set):
+
+        name, country = worker_and_country
+        if worker_type == "Cast":
+            first_name = get_first_name(country, name)
+            gender = gender_detector.get_gender(first_name, country)
+        else:
+            gender = gender_registry.loc[gender_registry['name'] == name, 'gender'].iloc[0]
+        gender_counter[gender] += 1
+
+    return gender_counter
+
+def count_gender_in_workers(df, worker_type, gender_registry, rated_bool=False):
+    gender_counter = Counter({'female': 0, 'male': 0})
+    gender_ratings = {'male': [], 'female': []}
+
+    for i, workers in enumerate(df[worker_type]):
+        if type(workers) != str: 
+            continue
+        workers_list = workers.split(', ')
+        
+        for j, name in enumerate(workers_list):
+            gender = gender_registry.loc[gender_registry['name'] == name, 'gender'].iloc[0]
+            if j == 0 and rated_bool:
+                gender_ratings[gender].append(df['Rating'][i])
+            gender_counter[gender] += 1
+
+    return gender_counter, gender_ratings
+
+def get_movies_of_specific_worker_and_gender(df, worker_type, gender_type, gender_registry):
+    worker_dict = {}
+    for i, workers in enumerate(df[worker_type]):
+        if type(workers) != str: 
+            continue
+        workers_list = workers.split(', ')
+        worker = workers_list[0]
+        gender = gender_registry.loc[gender_registry['name'] == worker, 'gender'].iloc[0]
+        if gender == gender_type:
+            if worker not in worker_dict:
+                worker_dict[worker] = []
+            worker_dict[worker].append((df['Title'][i], df['Rating'][i]))
+    return worker_dict
+
+def update_excel_sheet_with_ratings():
+    
+    table_data = []
+    counter_data = []
+    unique_counter_data = []
+    persons = ['audun', 'mali']
+    roles = ['Directors', 'Writers', 'Composers']
+
+    for person in persons:
+        df_rated = load_rated_dataframe(person)
+        df_all = load_all_dataframe(person)
+        for role in roles:
+            df_gender = pd.read_csv(fr"gender_registry\{role[:-1].lower()}_gender_registry.csv")
+            gender_counter, gender_ratings = count_gender_in_workers(df_rated, role, df_gender, True)
+            averages = get_ratings_averages(gender_ratings, True)
+            medians = get_ratings_medians(gender_ratings, True)
+
+            gender_counter, gender_ratings = count_gender_in_workers(df_all, role, df_gender, False)
+            table_data.append([person.capitalize(), role[:-1], 'Female', averages['female'], medians['female']])
+            table_data.append([person.capitalize(), role[:-1], 'Male', averages['male'], medians['male']])
+
+            counter_data.append([person.capitalize(), role[:-1], 'Female', gender_counter['female']])
+            counter_data.append([person.capitalize(), role[:-1], 'Male', gender_counter['male']])
+            
+            unique_gender_counter = count_unique_gender_in_workers(df_all, role, df_gender, df_all['OriginCountry'])
+            unique_counter_data.append([person.capitalize(), role[:-1], 'Female', unique_gender_counter['female']])
+            unique_counter_data.append([person.capitalize(), role[:-1], 'Male', unique_gender_counter['male']])
+
+    df_table = pd.DataFrame(table_data, columns=['Person', 'Role', 'Gender', 'Average Rating', 'Median Rating'])
+    df_counter = pd.DataFrame(counter_data, columns=['Person', 'Role', 'Gender', 'Number'])
+    df_unique_counter = pd.DataFrame(unique_counter_data, columns=['Person', 'Role', 'Gender', 'Number'])
+    with pd.ExcelWriter("gender_ratings_table.xlsx", engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+        df_table.to_excel(writer, sheet_name='Ratings', index=False)
+        df_counter.to_excel(writer, sheet_name='Counts', index=False)
+        df_unique_counter.to_excel(writer, sheet_name='UniqueCounts', index=False)
+
+    return None

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from process_results import (
     load_rated_dataframe,
     load_all_dataframe,
@@ -11,11 +12,22 @@ from process_results import (
     person_films,
     plot_contrarian_bars,
     plot_year_histogram,
-    plot_rated_people
+    plot_rated_people,
+    get_movies_of_specific_worker_and_gender,
+    update_excel_sheet_with_ratings
 )
 
 def main_rated(dir):
     df_rated = load_rated_dataframe(dir=dir)
+    update_excel_sheet_with_ratings()
+
+    role = "Directors"
+    gender = "female"
+    df_gender = pd.read_csv(fr"gender_registry\{role[:-1].lower()}_gender_registry.csv")
+    worker_dict = get_movies_of_specific_worker_and_gender(df_rated, role, gender, df_gender)
+    for keys, items in worker_dict.items():
+        print(keys, items)
+    print('\n\n\n')
 
     ratings = df_rated["Rating"]
     imdb_ratings = df_rated["IMDbRating"]

@@ -74,3 +74,51 @@ if __name__ == '__main__':
     else:
         raise ValueError("Invalid user specified.")
     main(dir)
+
+def check_country(country):
+    if ',' in country:
+        country = country.split(', ')[0]
+    country = country.replace(' ', '_')
+
+    if country == 'south_korea':
+        country = 'korea'
+    elif country == 'united_states':
+        country = 'usa'
+    elif country == 'united_kingdom':
+        country = 'great_britain'
+    elif country == 'australia':
+        country = 'great_britain'
+    elif country == 'new_zealand':
+        country = 'great_britain'
+    elif country == 'czechia':
+        country = 'czech_republic'
+
+    return country
+
+def get_first_name(country, name):
+    if country == 'korea':
+        first_name = name.split(' ')[-1].split('-')[0]
+    else:
+        first_name = name.split(' ')[0]
+    return first_name
+
+def add_name_to_gender_registry(name, country, gender_registry_path, gender_detector):
+    country = check_country(country.lower())
+    df_gender = pd.read_csv(gender_registry_path)
+    names = df_gender['name']
+    if name in names.values:
+        df_gender.to_csv(gender_registry_path, index=False)
+        return False
+    first_name = get_first_name(country, name)
+    gender = gender_detector.get_gender(first_name, country)
+    if gender != 'male' and gender != 'female':
+        gender = "unknown"
+        unknown = True
+    else:
+        unknown = False
+    df_gender = pd.concat([df_gender, pd.DataFrame([{
+        "name": name,
+        "gender": gender
+    }])], ignore_index=True)    
+    df_gender.to_csv(gender_registry_path, index=False)
+    return unknown
