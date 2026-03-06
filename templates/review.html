@@ -1,0 +1,45 @@
+<h2>Unknown genders</h2>
+
+{% if unknown_entries %}
+
+<table>
+<tr>
+  <th>Name</th>
+  <th>Category</th>
+  <th>Set Gender</th>
+</tr>
+
+{% for entry in unknown_entries %}
+
+<tr>
+
+<td>{{entry.name}}</td>
+<td>{{entry.category}}</td>
+
+<td>
+<form method="POST" action="/update_gender">
+
+<input type="hidden" name="name" value="{{entry.name}}">
+<input type="hidden" name="category" value="{{entry.category}}">
+
+<select name="gender">
+<option value="male">Male</option>
+<option value="female">Female</option>
+</select>
+
+<button type="submit">Save</button>
+
+</form>
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% else %}
+
+<p>No unknown genders 🎉</p>
+
+{% endif %}
