@@ -106,6 +106,15 @@ def main_rated(dir):
             f"Median: {actor_median_ratings[name]}\n"
             f"{film_ratings}")
     
+    name = "Ewan McGregor"
+    df_actor = df_rated[df_rated["Cast"].str.contains(name, na=False)][["Title", "Rating"]]
+    if len(df_actor["Title"]) >= 1:
+        film_ratings = dict(zip(df_actor["Title"], df_actor["Rating"]))
+        print(f"{dir} has rated {len(actor_ratings[name])} {name} films:\n"
+            f"Average: {actor_avg_ratings[name]}\n"
+            f"Median: {actor_median_ratings[name]}\n"
+            f"{film_ratings}")
+    
 
     # print(composer_avg_ratings)
     # print(actor_avg_ratings)
