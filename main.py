@@ -184,6 +184,7 @@ def main_all(dir):
     # print(f"I have seen {actor_counts['Mark Ruffalo']} Mark Ruffalo films:\n{person_films(df_all, 'Mark Ruffalo', 'Cast')}")
     # print(f"I have seen {actor_counts['Tom Cruise']} Tom Cruise films:\n{person_films(df_all, 'Tom Cruise', 'Cast')}")
     print(f"{dir} has seen {actor_counts['Matt Damon']} Matt Damon films:\n{person_films(df_all, 'Matt Damon', 'Cast')}")
+    print(f"{dir} has seen {actor_counts['Ewan McGregor']} Ewan McGregor films:\n{person_films(df_all, 'Ewan McGregor', 'Cast')}")
     # print(f"I have seen {actor_counts['Vera Farmiga']} Vera Farmiga films:\n{person_films(df_all, 'Vera Farmiga', 'Cast')}")
     # print(f"I have seen {actor_counts['Anne Hathaway']} Anne Hathaway films:\n{person_films(df_all, 'Anne Hathaway', 'Cast')}\n")
 
