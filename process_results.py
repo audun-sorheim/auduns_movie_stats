@@ -154,7 +154,7 @@ def plot_year_histogram(years, dir):
     plt.savefig(f"plots/{dir}/hists/films_years_hist.png")
     plt.close()
 
-def process_people(peoples):
+def process_people(peoples, num_actors):
 
     peoples_list = []
 
@@ -164,14 +164,14 @@ def process_people(peoples):
         if type(people) == float or type(people) == int:
             people_list = [people]
         elif len(people) > 1:
-            people_list = people.split(", ")
+            people_list = people.split(", ")[:num_actors]
         peoples_list.append(people_list)
 
     return peoples_list
 
-def get_person_counts(peoples):
+def get_person_counts(peoples, num_actors=10):
 
-    peoples = process_people(peoples)
+    peoples = process_people(peoples, num_actors=num_actors)
 
     person_counts = collections.Counter(person for people in peoples for person in people)
 
