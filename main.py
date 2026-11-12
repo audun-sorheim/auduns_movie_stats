@@ -146,12 +146,11 @@ def main_all(dir):
     plot_all_ratings(imdb_ratings, metascore, dir=dir)
 
     plot_world_map(df_all, dir=dir)
-
     year_counts = df_all["Year"].value_counts().sort_index()
     plot_year_histogram(df_all["Year"].values, dir=dir)
     # print(f"Number of films seen per year:\n{plotyear_counts}\n")
 
-    actor_counts = get_person_counts(df_all["Cast"].copy())
+    actor_counts = get_person_counts(df_all["Cast"].copy(), 16)
     director_counts = get_person_counts(df_all["Directors"].copy())
     writer_counts = get_person_counts(df_all["Writers"].copy())
     composer_counts = get_person_counts(df_all["Composers"].copy())
