@@ -1,5 +1,6 @@
 import pandas as pd
 from get_metadata import fetch_metadata
+from gender_guesser.detector import NoCountryError
 
 def write_rated_row(film_name, film_year, rating, imdb_id, dir):
 
@@ -110,7 +111,10 @@ def add_name_to_gender_registry(name, country, gender_registry_path, gender_dete
         df_gender.to_csv(gender_registry_path, index=False)
         return False
     first_name = get_first_name(country, name)
-    gender = gender_detector.get_gender(first_name, country)
+    try:
+        gender = gender_detector.get_gender(first_name, country)
+    except NoCountryError:
+        gender = gender_detector.get_gender(first_name)
     if gender != 'male' and gender != 'female':
         gender = "unknown"
         unknown = True
